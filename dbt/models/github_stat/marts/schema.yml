@@ -1,0 +1,337 @@
+version: 2
+
+models:
+  - name: dm_repo_latest
+    description: "Latest repository snapshot per repo"
+    columns:
+      - name: meta_full_name
+        description: "Repository full name"
+        data_tests:
+          - not_null
+          - unique
+      - name: meta_snapshot_month
+        description: "Month of the snapshot"
+      - name: meta_fetched_at
+        description: "Snapshot timestamp"
+        data_tests:
+          - not_null
+      - name: meta_entity
+        description: "Loaded entity type"
+      - name: meta_owner
+        description: "Repository owner from metadata"
+      - name: meta_repo
+        description: "Repository name from metadata"
+      - name: meta_run_date
+        description: "Pipeline run date"
+      - name: id
+        description: "GitHub repository id"
+        data_tests:
+          - not_null
+      - name: node_id
+        description: "GitHub node id"
+      - name: name
+        description: "Repository short name"
+      - name: full_name
+        description: "Repository full name from GitHub"
+      - name: private
+        description: "Private repository flag"
+      - name: html_url
+        description: "Repository URL"
+      - name: description
+        description: "Repository description"
+      - name: fork
+        description: "Fork repository flag"
+      - name: created_at
+        description: "Repository creation timestamp"
+      - name: updated_at
+        description: "Repository update timestamp"
+      - name: pushed_at
+        description: "Last push timestamp"
+      - name: homepage
+        description: "Repository homepage URL"
+      - name: size
+        description: "Repository size"
+      - name: stargazers_count
+        description: "Number of stars"
+      - name: watchers_count
+        description: "Number of watchers"
+      - name: forks_count
+        description: "Number of forks"
+      - name: open_issues_count
+        description: "Number of open issues"
+      - name: language
+        description: "Primary language"
+      - name: has_issues
+        description: "Issues enabled flag"
+      - name: has_projects
+        description: "Projects enabled flag"
+      - name: has_downloads
+        description: "Downloads enabled flag"
+      - name: has_wiki
+        description: "Wiki enabled flag"
+      - name: has_pages
+        description: "Pages enabled flag"
+      - name: has_discussions
+        description: "Discussions enabled flag"
+      - name: archived
+        description: "Archived repository flag"
+      - name: disabled
+        description: "Disabled repository flag"
+      - name: allow_forking
+        description: "Allow forking flag"
+      - name: is_template
+        description: "Template repository flag"
+      - name: visibility
+        description: "Repository visibility"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['public', 'private', 'internal']
+      - name: default_branch
+        description: "Default branch name"
+      - name: topics
+        description: "Repository topics"
+      - name: network_count
+        description: "Repository network count"
+      - name: subscribers_count
+        description: "Repository subscriber count"
+      - name: owner_login
+        description: "Owner login"
+      - name: owner_id
+        description: "Owner id"
+      - name: owner_type
+        description: "Owner type"
+      - name: owner_html_url
+        description: "Owner profile URL"
+      - name: owner_site_admin
+        description: "Owner site admin flag"
+      - name: organization_login
+        description: "Organization login"
+      - name: organization_id
+        description: "Organization id"
+      - name: organization_type
+        description: "Organization type"
+      - name: organization_html_url
+        description: "Organization profile URL"
+      - name: organization_site_admin
+        description: "Organization site admin flag"
+      - name: license_key
+        description: "License key"
+      - name: license_name
+        description: "License name"
+      - name: license_spdx_id
+        description: "License SPDX id"
+      - name: license_url
+        description: "License URL"
+
+  - name: dm_repo_health
+    description: "Repository health, maturity and popularity metrics"
+    columns:
+      - name: meta_full_name
+        description: "Repository full name"
+        data_tests:
+          - not_null
+          - unique
+      - name: meta_owner
+        description: "Repository owner from metadata"
+      - name: meta_repo
+        description: "Repository name from metadata"
+      - name: owner_login
+        description: "Owner login"
+      - name: organization_login
+        description: "Organization login"
+      - name: meta_snapshot_month
+        description: "Month of the snapshot"
+      - name: meta_fetched_at
+        description: "Snapshot timestamp"
+      - name: language
+        description: "Primary language with Unknown fallback"
+      - name: license_name
+        description: "License name"
+      - name: archived
+        description: "Archived repository flag"
+      - name: disabled
+        description: "Disabled repository flag"
+      - name: fork
+        description: "Fork repository flag"
+      - name: stargazers_count
+        description: "Number of stars"
+      - name: forks_count
+        description: "Number of forks"
+      - name: watchers_count
+        description: "Number of watchers"
+      - name: subscribers_count
+        description: "Number of subscribers"
+      - name: network_count
+        description: "Repository network count"
+      - name: open_issues_count
+        description: "Number of open issues"
+      - name: created_at
+        description: "Repository creation timestamp"
+      - name: updated_at
+        description: "Repository update timestamp"
+      - name: pushed_at
+        description: "Last push timestamp"
+      - name: repo_age_days
+        description: "Repository age in days"
+      - name: days_since_update
+        description: "Days since last repository update"
+      - name: days_since_push
+        description: "Days since last push"
+      - name: repo_maturity_score
+        description: "Calculated repository maturity score"
+        data_tests:
+          - not_null
+      - name: repo_popularity_score
+        description: "Calculated repository popularity score"
+      - name: freshness_bucket
+        description: "Freshness classification based on pushed_at"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['unknown', 'active', 'warm', 'stale', 'cold']
+
+  - name: dm_repo_language_summary
+    description: "Aggregated repository metrics by language"
+    columns:
+      - name: language
+        description: "Primary repository language"
+        data_tests:
+          - not_null
+          - unique
+      - name: repo_count
+        description: "Number of repositories in language bucket"
+        data_tests:
+          - not_null
+      - name: total_stars
+        description: "Total stars in language bucket"
+        data_tests:
+          - not_null
+      - name: avg_stars
+        description: "Average stars in language bucket"
+      - name: median_stars
+        description: "Median stars in language bucket"
+      - name: total_forks
+        description: "Total forks in language bucket"
+      - name: avg_forks
+        description: "Average forks in language bucket"
+      - name: total_watchers
+        description: "Total watchers in language bucket"
+      - name: total_open_issues
+        description: "Total open issues in language bucket"
+      - name: archived_repo_count
+        description: "Number of archived repositories in language bucket"
+      - name: stale_repo_count
+        description: "Number of stale repositories in language bucket"
+      - name: snapshot_at
+        description: "Latest snapshot timestamp inside bucket"
+        data_tests:
+          - not_null
+
+  - name: dm_repo_topic_summar
+    description: "Aggregated repository metrics by topic"
+    columns:
+      - name: topic
+        description: "Repository topic"
+        data_tests:
+          - not_null
+          - unique
+      - name: repo_count
+        description: "Number of repositories in topic bucket"
+        data_tests:
+          - not_null
+      - name: repo_uniq_count
+        description: "Number of unique repositories in topic bucket"
+      - name: total_stars
+        description: "Total stars in topic bucket"
+        data_tests:
+          - not_null
+      - name: avg_stars
+        description: "Average stars in topic bucket"
+      - name: median_stars
+        description: "Median stars in topic bucket"
+      - name: total_forks
+        description: "Total forks in topic bucket"
+      - name: total_watchers
+        description: "Total watchers in topic bucket"
+      - name: archived_repo_count
+        description: "Number of archived repositories in topic bucket"
+      - name: snapshot_at
+        description: "Latest snapshot timestamp inside bucket"
+        data_tests:
+          - not_null
+
+  - name: dm_repo_popularity_ranking
+    description: "Repository ranking by popularity score"
+    columns:
+      - name: popularity_rank
+        description: "Dense rank by popularity score"
+        data_tests:
+          - not_null
+      - name: meta_full_name
+        description: "Repository full name"
+        data_tests:
+          - not_null
+          - unique
+      - name: meta_owner
+        description: "Repository owner from metadata"
+      - name: meta_repo
+        description: "Repository name from metadata"
+      - name: meta_fetched_at
+        description: "Snapshot timestamp"
+        data_tests:
+          - not_null
+      - name: language
+        description: "Primary language with Unknown fallback"
+      - name: archived
+        description: "Archived repository flag"
+      - name: fork
+        description: "Fork repository flag"
+      - name: stargazers_count
+        description: "Number of stars"
+      - name: forks_count
+        description: "Number of forks"
+      - name: watchers_count
+        description: "Number of watchers"
+      - name: days_since_push
+        description: "Days since last push"
+      - name: repo_popularity_score
+        description: "Calculated popularity score"
+        data_tests:
+          - not_null
+
+  - name: dm_owner_summary
+    description: "Aggregated repository metrics by owner or organization"
+    columns:
+      - name: owner_group
+        description: "Owner login or organization login"
+        data_tests:
+          - not_null
+          - unique
+      - name: repo_count
+        description: "Number of repositories in owner bucket"
+        data_tests:
+          - not_null
+      - name: total_stars
+        description: "Total stars in owner bucket"
+        data_tests:
+          - not_null
+      - name: avg_stars
+        description: "Average stars in owner bucket"
+      - name: total_forks
+        description: "Total forks in owner bucket"
+      - name: total_watchers
+        description: "Total watchers in owner bucket"
+      - name: total_open_issues
+        description: "Total open issues in owner bucket"
+      - name: archived_repo_count
+        description: "Number of archived repositories in owner bucket"
+      - name: active_repo_count
+        description: "Number of active repositories in owner bucket"
+      - name: language_count
+        description: "Number of languages used in owner bucket"
+      - name: snapshot_at
+        description: "Latest snapshot timestamp inside bucket"
+        data_tests:
+          - not_null

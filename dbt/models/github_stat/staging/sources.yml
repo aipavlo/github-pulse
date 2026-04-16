@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: github_raw
+    schema: dezc_dwh
+    tables:
+      - name: raw_normalized
+        description: Normalized raw GitHub repository snapshots from JSON files. Target is ReplacingMergeTree

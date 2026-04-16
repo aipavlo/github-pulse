@@ -1,0 +1,26 @@
+github_stat:
+  target: prod
+  outputs:
+    dev:
+      type: clickhouse
+      driver: http
+      host: clickhouse
+      port: 8123
+      # database: dev
+      schema: dev
+      user: "{{ env_var('DWH_USER', 'default_user') }}"
+      password: "{{ env_var('DWH_PASSWORD', 'default_pass') }}"
+      secure: false
+      threads: 2
+
+    prod:
+      type: clickhouse
+      driver: http
+      host: clickhouse
+      port: 8123
+      # database: "{{ env_var('DWH_DB', 'dwh') }}"
+      schema: "{{ env_var('DWH_DB', 'dwh') }}"
+      user: "{{ env_var('DWH_USER', 'default_user') }}"
+      password: "{{ env_var('DWH_PASSWORD', 'default_pass') }}"
+      secure: false
+      threads: 2

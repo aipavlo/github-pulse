@@ -1,0 +1,127 @@
+version: 2
+
+models:
+  - name: stg_repositories
+    description: "Repository snapshots loaded from dezc_dwh.raw_normalized into ReplacingMergeTree staging table"
+
+    columns:
+      - name: meta_snapshot_month
+        description: "Month bucket derived from meta_fetched_at"
+        data_tests:
+          - not_null
+
+      - name: meta_entity
+        description: "Entity type"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['repository']
+
+      - name: meta_owner
+        description: "Repository owner"
+        data_tests:
+          - not_null
+
+      - name: meta_repo
+        description: "Repository name"
+        data_tests:
+          - not_null
+
+      - name: meta_full_name
+        description: "Repository full name in owner/repo format"
+        data_tests:
+          - not_null
+
+      - name: meta_fetched_at
+        description: "Snapshot timestamp"
+        data_tests:
+          - not_null
+
+      - name: id
+        description: "GitHub repository id"
+        data_tests:
+          - not_null
+
+      - name: visibility
+        description: "Repository visibility"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['public', 'private', 'internal']
+
+      - name: private
+        description: "Private flag"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: fork
+        description: "Fork flag"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+  - name: stg_repositories_latest
+    description: "Latest repository snapshot per repo from stg_repositories FINAL"
+
+    columns:
+      - name: meta_full_name
+        description: "Repository full name in owner/repo format"
+        data_tests:
+          - not_null
+          - unique
+
+      - name: meta_owner
+        description: "Repository owner"
+        data_tests:
+          - not_null
+
+      - name: meta_repo
+        description: "Repository name"
+        data_tests:
+          - not_null
+
+      - name: meta_fetched_at
+        description: "Latest snapshot timestamp"
+        data_tests:
+          - not_null
+
+      - name: meta_snapshot_month
+        description: "Month bucket of the latest snapshot"
+        data_tests:
+          - not_null
+
+      - name: id
+        description: "GitHub repository id"
+        data_tests:
+          - not_null
+
+      - name: visibility
+        description: "Repository visibility"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['public', 'private', 'internal']
+
+      - name: private
+        description: "Private flag"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+
+      - name: fork
+        description: "Fork flag"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false

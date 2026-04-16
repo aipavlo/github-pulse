@@ -1,0 +1,116 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:25.10
+    container_name: dezc_clickhouse
+    hostname: dezc_clickhouse
+    environment:
+      CLICKHOUSE_DB: ${DWH_DB}
+      CLICKHOUSE_USER: ${DWH_USER}
+      CLICKHOUSE_PASSWORD: ${DWH_PASSWORD}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    stop_grace_period: 2m
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./infra/clickhouse/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - clickhouse_data:/var/lib/clickhouse
+      - clickhouse_logs:/var/log/clickhouse-server
+      - ./data:/var/lib/clickhouse/user_files/import:ro
+
+  lightdash_db:
+    image: pgvector/pgvector:pg15
+    container_name: lightdash_db
+    hostname: lightdash_db
+    environment:
+      POSTGRES_USER: ${LIGHTDASH_DB_USER}
+      POSTGRES_PASSWORD: ${LIGHTDASH_DB_PASSWORD}
+      POSTGRES_DB: ${LIGHTDASH_DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LIGHTDASH_DB_USER} -d ${LIGHTDASH_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - lightdash_db_data:/var/lib/postgresql/data      
+
+  dbt:
+    build:
+      context: .
+      dockerfile: infra/dbt/Dockerfile
+      args:
+        DBT_CORE_VERSION: ${DBT_CORE_VERSION}
+        DBT_CH_VERSION: ${DBT_CH_VERSION}
+    container_name: dbt
+    hostname: dbt
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DBT_PROFILES_DIR: /usr/app/dbt
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+    working_dir: /usr/app/dbt
+    volumes:
+      - ./dbt:/usr/app/dbt
+
+  lightdash:
+    image: lightdash/lightdash:0.2248.3
+    container_name: lightdash
+    hostname: lightdash
+    depends_on:
+      lightdash_db:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      PGHOST: lightdash_db
+      PGPORT: 5432
+      PGUSER: ${LIGHTDASH_DB_USER}
+      PGPASSWORD: ${LIGHTDASH_DB_PASSWORD}
+      PGDATABASE: ${LIGHTDASH_DB_NAME}
+      SECURE_COOKIES: "false"
+      TRUST_PROXY: "false"
+      SITE_URL: http://localhost:8080
+      PORT: 8080
+    volumes:
+      - ./dbt:/usr/app/dbt:ro      
+
+  prefect:
+    build:
+      context: .
+      dockerfile: infra/prefect/Dockerfile
+      args:
+        DBT_CORE_VERSION: ${DBT_CORE_VERSION}
+        DBT_CH_VERSION: ${DBT_CH_VERSION}
+    container_name: prefect
+    hostname: prefect
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DBT_PROFILES_DIR: /usr/app/dbt
+      PREFECT_API_EVENTS_STREAM_OUT_ENABLED: "false"
+      PREFECT_SERVER_EPHEMERAL_STARTUP_TIMEOUT_SECONDS: "60"
+      DO_NOT_TRACK: "1"
+    working_dir: /usr/app
+    volumes:
+      - ./:/usr/app
+    command: ["tail", "-f", "/dev/null"]
+
+volumes:
+  clickhouse_data:
+  clickhouse_logs:
+  lightdash_db_data:
