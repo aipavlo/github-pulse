@@ -12,3 +12,11 @@ __pycache__/
 *.pyc
 .prefect/
 .run_*.prefect
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+build/
+dist/
