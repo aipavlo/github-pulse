@@ -7,6 +7,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
+from requests.exceptions import HTTPError, RequestException
 
 
 def parse_args():
@@ -24,7 +25,20 @@ def normalize_run_date(value):
 
 
 def parse_repo_url(url):
-    owner, repo = urlparse(url.strip()).path.strip("/").split("/")[:2]
+    parsed = urlparse(url.strip())
+    parts = [part for part in parsed.path.strip("/").split("/") if part]
+
+    if parsed.netloc not in {"github.com", "www.github.com"} or len(parts) < 2:
+        raise ValueError(f"Invalid GitHub repository URL: {url}")
+
+    if len(parts) != 2:
+        raise ValueError(f"Malformed GitHub repository URL: {url}")
+
+    owner, repo = parts[:2]
+
+    if any(marker in repo for marker in ("http://", "https://", "github.com")):
+        raise ValueError(f"Malformed GitHub repository URL: {url}")
+
     return owner, repo
 
 
@@ -32,13 +46,20 @@ def get_repositories(csv_path, repo_arg):
     if repo_arg:
         return [tuple(repo_arg.strip().split("/", 1))]
 
+    repositories = []
     with open(csv_path, "r", encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
-        return [
-            parse_repo_url(row["url"])
-            for row in reader
-            if row.get("url", "").strip()
-        ]
+        for row in reader:
+            url = row.get("url", "").strip()
+            if not url:
+                continue
+
+            try:
+                repositories.append(parse_repo_url(url))
+            except ValueError as exc:
+                print(f"[skip] {exc}")
+
+    return repositories
 
 
 def build_session():
@@ -82,6 +103,7 @@ def main():
     repositories = get_repositories(args.csv, args.repo)
     saved = 0
     skipped = 0
+    failed = 0
 
     for owner, repo in repositories:
         repo_dir = snapshot_path(args.raw_root, run_date, owner, repo)
@@ -91,8 +113,21 @@ def main():
             skipped += 1
             continue
 
-        response = session.get(f"https://api.github.com/repos/{owner}/{repo}", timeout=60)
-        response.raise_for_status()
+        try:
+            response = session.get(f"https://api.github.com/repos/{owner}/{repo}", timeout=60)
+            response.raise_for_status()
+        except HTTPError as exc:
+            status_code = exc.response.status_code if exc.response is not None else "unknown"
+            print(f"[skip] {owner}/{repo} -> GitHub API returned {status_code}")
+            skipped += 1
+            failed += 1
+            continue
+        except RequestException as exc:
+            print(f"[skip] {owner}/{repo} -> request failed: {exc}")
+            skipped += 1
+            failed += 1
+            continue
+
         payload = response.json()
 
         now = datetime.now(timezone.utc)
@@ -113,6 +148,7 @@ def main():
     print(f"total={len(repositories)}")
     print(f"saved={saved}")
     print(f"skipped={skipped}")
+    print(f"failed={failed}")
 
 
 if __name__ == "__main__":

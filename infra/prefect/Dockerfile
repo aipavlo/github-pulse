@@ -8,6 +8,10 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip \
- && pip install "prefect==3.6.24" "dbt-core==${DBT_CORE_VERSION}" "dbt-clickhouse==${DBT_CH_VERSION}" requests==2.32.3 PyYAML==6.0.2
+ && pip install "prefect==3.6.24" "dbt-core==${DBT_CORE_VERSION}" "dbt-clickhouse==${DBT_CH_VERSION}"
+
+COPY ingestion/requirements.txt /tmp/ingestion-requirements.txt
+
+RUN pip install -r /tmp/ingestion-requirements.txt
 
 CMD ["tail", "-f", "/dev/null"]

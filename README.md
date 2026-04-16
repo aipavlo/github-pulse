@@ -34,6 +34,12 @@ make prefect-run
 
 `RUN_DATE` uses the current month by default.
 
+Before running the flow, validate the Python ingestion code:
+
+```bash
+make qa-python
+```
+
 For only transformations:
 
 ```bash

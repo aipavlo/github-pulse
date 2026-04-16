@@ -1,8 +1,8 @@
 services:
   clickhouse:
     image: clickhouse/clickhouse-server:25.10
-    container_name: dezc_clickhouse
-    hostname: dezc_clickhouse
+    container_name: gp_clickhouse
+    hostname: gp_clickhouse
     environment:
       CLICKHOUSE_DB: ${DWH_DB}
       CLICKHOUSE_USER: ${DWH_USER}

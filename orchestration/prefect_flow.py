@@ -5,7 +5,6 @@ from pathlib import Path
 
 from prefect import flow, task
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DBT_DIR = PROJECT_ROOT / "dbt"
 

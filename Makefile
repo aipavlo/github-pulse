@@ -1,7 +1,7 @@
 PROJECT_NAME := github-repository-radar
 RUN_DATE ?= $(shell date +%Y-%m-01)
 
-.PHONY: help env build up down logs dbt-run dbt-test prefect-run lightdash check
+.PHONY: help env build up down logs dbt-run dbt-test prefect-run lightdash lint test-python qa-python check
 
 help:
 	@echo "$(PROJECT_NAME) commands"
@@ -13,6 +13,9 @@ help:
 	@echo "make dbt-run      - run dbt models"
 	@echo "make dbt-test     - run dbt tests"
 	@echo "make prefect-run  - run the full Prefect flow"
+	@echo "make lint         - run Python linters"
+	@echo "make test-python  - run Python unit tests"
+	@echo "make qa-python    - run Python lint + tests"
 	@echo "make check        - run the main validation flow"
 	@echo "make lightdash    - show the local Lightdash URL"
 
@@ -40,8 +43,19 @@ dbt-test:
 prefect-run:
 	docker compose run --rm prefect python orchestration/prefect_flow.py --run-date $(RUN_DATE)
 
+lint:
+	docker compose run --rm prefect ruff check ingestion orchestration tests
+
+test-python:
+	docker compose run --rm prefect pytest
+
+qa-python:
+	$(MAKE) lint
+	$(MAKE) test-python
+
 check:
 	$(MAKE) build
+	$(MAKE) qa-python
 	$(MAKE) up
 	$(MAKE) prefect-run RUN_DATE=$(RUN_DATE)
 	$(MAKE) dbt-run

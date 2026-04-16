@@ -5,7 +5,6 @@ from pathlib import Path
 
 import requests
 
-
 OUTPUT_FILE = Path("data/repositories_urls.csv")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 SEARCH_URL = "https://api.github.com/search/repositories"
