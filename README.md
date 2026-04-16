@@ -1,4 +1,4 @@
-# GitHub Repository Radar
+# GitHub-Pulse Repository Radar
 
 This project collects public GitHub repository metadata and builds simple analytics tables in ClickHouse. It helps us see which repositories are active, popular, and growing over time.
 
