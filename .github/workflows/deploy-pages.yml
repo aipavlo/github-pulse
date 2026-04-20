@@ -2,9 +2,9 @@ name: Deploy Pages
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "pages-*"
+  release:
+    types:
+      - published
 
 permissions:
   contents: read

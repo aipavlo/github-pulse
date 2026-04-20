@@ -163,7 +163,8 @@ def test_deploy_workflow_publishes_pages_artifact_from_evidence_build():
     steps = build_job["steps"]
 
     assert "workflow_dispatch" in workflow_trigger
-    assert workflow_trigger["push"]["tags"] == ["pages-*"]
+    assert "push" not in workflow_trigger
+    assert workflow_trigger["release"]["types"] == ["published"]
     assert workflow["permissions"] == {"contents": "read"}
     assert deploy_job["permissions"] == {"pages": "write", "id-token": "write"}
     assert workflow["concurrency"]["group"] == "github-pages"
@@ -181,6 +182,32 @@ def test_deploy_workflow_publishes_pages_artifact_from_evidence_build():
     assert deploy_step["uses"].startswith("actions/deploy-pages@")
     assert_full_sha_action_ref(deploy_step["uses"])
     assert deploy_job["needs"] == "build"
+
+
+def test_version_tag_creates_draft_release_before_deploy():
+    workflow = load_yaml(WORKFLOWS_DIR / "create-draft-release.yml")
+    workflow_trigger = workflow_on(workflow)
+    job = workflow["jobs"]["create-draft-release"]
+    step = job["steps"][0]
+    readme = read_text(PROJECT_ROOT / "README.md")
+
+    assert workflow_trigger["push"]["tags"] == ["v*.*.*"]
+    assert workflow["permissions"] == {"contents": "write"}
+    assert step["name"] == "Create draft release"
+    assert step["env"]["GH_TOKEN"] == "${{ github.token }}"
+    assert "gh release create" in step["run"]
+    assert "--draft" in step["run"]
+    assert "--verify-tag" in step["run"]
+    assert "`v*.*.*` tag, such as `v0.0.1`, creates a draft release" in readme
+    assert "v*.*.* tag -> draft release -> Publish release -> deploy Pages" in readme
+
+
+def test_python_qa_runs_for_workflow_changes():
+    workflow = load_yaml(WORKFLOWS_DIR / "python-qa.yml")
+    workflow_trigger = workflow_on(workflow)
+
+    assert ".github/workflows/**" in workflow_trigger["pull_request"]["paths"]
+    assert ".github/workflows/**" in workflow_trigger["push"]["paths"]
 
 
 def test_security_workflows_and_policy_files_exist():

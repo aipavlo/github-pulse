@@ -3,7 +3,7 @@ name: Python QA
 "on":
   pull_request:
     paths:
-      - ".github/workflows/python-qa.yml"
+      - ".github/workflows/**"
       - "ingestion/**"
       - "orchestration/**"
       - "publish/**"
@@ -14,7 +14,7 @@ name: Python QA
     branches:
       - main
     paths:
-      - ".github/workflows/python-qa.yml"
+      - ".github/workflows/**"
       - "ingestion/**"
       - "orchestration/**"
       - "publish/**"
