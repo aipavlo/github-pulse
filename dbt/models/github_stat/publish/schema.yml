@@ -1,0 +1,500 @@
+version: 2
+
+models:
+  - name: publish_site_kpis
+    description: "Publish-ready single-row KPI snapshot for the Evidence site"
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "snapshot_date <= today()"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "repo_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "owner_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "language_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "topic_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_stars >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_forks >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "active_repo_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "archived_repo_count >= 0"
+    columns:
+      - name: snapshot_date
+        description: "Snapshot date published to the site"
+        data_tests:
+          - not_null
+          - unique
+      - name: generated_at
+        description: "Timestamp when the KPI export dataset was generated"
+        data_tests:
+          - not_null
+      - name: repo_count
+        description: "Repository count in the latest snapshot"
+        data_tests:
+          - not_null
+      - name: owner_count
+        description: "Owner-group count in the latest snapshot"
+        data_tests:
+          - not_null
+      - name: language_count
+        description: "Language bucket count in the latest snapshot"
+        data_tests:
+          - not_null
+      - name: topic_count
+        description: "Topic bucket count in the latest snapshot"
+        data_tests:
+          - not_null
+      - name: total_stars
+        description: "Total stars across the latest snapshot"
+        data_tests:
+          - not_null
+      - name: total_forks
+        description: "Total forks across the latest snapshot"
+        data_tests:
+          - not_null
+      - name: active_repo_count
+        description: "Repositories with a push in the last 30 days"
+        data_tests:
+          - not_null
+      - name: archived_repo_count
+        description: "Archived repositories in the latest snapshot"
+        data_tests:
+          - not_null
+
+  - name: publish_repo_top
+    description: "Publish-ready ranked repository dataset for landing-page tables and cards"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - snapshot_date
+              - repo_full_name
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - snapshot_date
+              - popularity_rank
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "snapshot_date <= today()"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "popularity_rank >= 1"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "stargazers_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "forks_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "watchers_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "days_since_push is null or days_since_push >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "repo_popularity_score >= 0"
+    columns:
+      - name: snapshot_date
+        description: "Snapshot date published to the site"
+        data_tests:
+          - not_null
+      - name: generated_at
+        description: "Timestamp when the ranked repository dataset was generated"
+        data_tests:
+          - not_null
+      - name: popularity_rank
+        description: "Dense popularity rank used by the site"
+        data_tests:
+          - not_null
+      - name: repo_full_name
+        description: "Repository full name in owner/repo format"
+        data_tests:
+          - not_null
+      - name: owner_login
+        description: "Repository owner login"
+        data_tests:
+          - not_null
+      - name: repo_name
+        description: "Repository short name"
+        data_tests:
+          - not_null
+      - name: repo_url
+        description: "Public repository URL"
+        data_tests:
+          - not_null
+      - name: description
+        description: "Public repository description"
+      - name: primary_language
+        description: "Normalized repository primary language"
+        data_tests:
+          - not_null
+      - name: stargazers_count
+        description: "Repository star count"
+        data_tests:
+          - not_null
+      - name: forks_count
+        description: "Repository fork count"
+        data_tests:
+          - not_null
+      - name: watchers_count
+        description: "Repository watcher count"
+        data_tests:
+          - not_null
+      - name: days_since_push
+        description: "Days since the last push, nullable when push timestamp is missing"
+      - name: repo_popularity_score
+        description: "Popularity score used for ranking"
+        data_tests:
+          - not_null
+      - name: is_archived
+        description: "Archived repository flag"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+      - name: is_fork
+        description: "Fork repository flag"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+
+  - name: publish_repo_trend_monthly
+    description: "Publish-ready monthly repository trend dataset for time-series views"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - snapshot_month
+              - repo_full_name
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "snapshot_month <= today()"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "snapshot_month = toStartOfMonth(snapshot_month)"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "stargazers_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "forks_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "watchers_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "open_issues_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "repo_popularity_score >= 0"
+    columns:
+      - name: snapshot_month
+        description: "First day of the monthly snapshot bucket"
+        data_tests:
+          - not_null
+      - name: repo_full_name
+        description: "Repository full name in owner/repo format"
+        data_tests:
+          - not_null
+      - name: owner_login
+        description: "Repository owner login"
+        data_tests:
+          - not_null
+      - name: repo_name
+        description: "Repository short name"
+        data_tests:
+          - not_null
+      - name: primary_language
+        description: "Normalized repository primary language"
+        data_tests:
+          - not_null
+      - name: stargazers_count
+        description: "Star count at the end of the month"
+        data_tests:
+          - not_null
+      - name: forks_count
+        description: "Fork count at the end of the month"
+        data_tests:
+          - not_null
+      - name: watchers_count
+        description: "Watcher count at the end of the month"
+        data_tests:
+          - not_null
+      - name: open_issues_count
+        description: "Open issues count at the end of the month"
+        data_tests:
+          - not_null
+      - name: repo_popularity_score
+        description: "Popularity score at the end of the month"
+        data_tests:
+          - not_null
+
+  - name: publish_owner_summary
+    description: "Publish-ready owner-group aggregation for Evidence owner views"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - snapshot_date
+              - owner_group
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "snapshot_date <= today()"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "repo_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_stars >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "avg_stars >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_forks >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_watchers >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_open_issues >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "archived_repo_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "active_repo_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "language_count >= 0"
+    columns:
+      - name: snapshot_date
+        description: "Snapshot date published to the site"
+        data_tests:
+          - not_null
+      - name: owner_group
+        description: "Owner or organization grouping key"
+        data_tests:
+          - not_null
+      - name: repo_count
+        description: "Repository count for the owner-group"
+        data_tests:
+          - not_null
+      - name: total_stars
+        description: "Total stars for the owner-group"
+        data_tests:
+          - not_null
+      - name: avg_stars
+        description: "Average stars for the owner-group"
+        data_tests:
+          - not_null
+      - name: total_forks
+        description: "Total forks for the owner-group"
+        data_tests:
+          - not_null
+      - name: total_watchers
+        description: "Total watchers for the owner-group"
+        data_tests:
+          - not_null
+      - name: total_open_issues
+        description: "Total open issues for the owner-group"
+        data_tests:
+          - not_null
+      - name: archived_repo_count
+        description: "Archived repositories for the owner-group"
+        data_tests:
+          - not_null
+      - name: active_repo_count
+        description: "Active repositories for the owner-group"
+        data_tests:
+          - not_null
+      - name: language_count
+        description: "Distinct language count for the owner-group"
+        data_tests:
+          - not_null
+
+  - name: publish_language_summary
+    description: "Publish-ready language aggregation for Evidence language views"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - snapshot_date
+              - language
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "snapshot_date <= today()"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "repo_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_stars >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "avg_stars >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "median_stars >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_forks >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "avg_forks >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_watchers >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_open_issues >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "archived_repo_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "stale_repo_count >= 0"
+    columns:
+      - name: snapshot_date
+        description: "Snapshot date published to the site"
+        data_tests:
+          - not_null
+      - name: language
+        description: "Normalized primary language bucket"
+        data_tests:
+          - not_null
+      - name: repo_count
+        description: "Repository count in the language bucket"
+        data_tests:
+          - not_null
+      - name: total_stars
+        description: "Total stars in the language bucket"
+        data_tests:
+          - not_null
+      - name: avg_stars
+        description: "Average stars in the language bucket"
+        data_tests:
+          - not_null
+      - name: median_stars
+        description: "Median stars in the language bucket"
+        data_tests:
+          - not_null
+      - name: total_forks
+        description: "Total forks in the language bucket"
+        data_tests:
+          - not_null
+      - name: avg_forks
+        description: "Average forks in the language bucket"
+        data_tests:
+          - not_null
+      - name: total_watchers
+        description: "Total watchers in the language bucket"
+        data_tests:
+          - not_null
+      - name: total_open_issues
+        description: "Total open issues in the language bucket"
+        data_tests:
+          - not_null
+      - name: archived_repo_count
+        description: "Archived repositories in the language bucket"
+        data_tests:
+          - not_null
+      - name: stale_repo_count
+        description: "Stale repositories in the language bucket"
+        data_tests:
+          - not_null
+
+  - name: publish_topic_summary
+    description: "Publish-ready topic aggregation for Evidence topic views"
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - snapshot_date
+              - topic
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "snapshot_date <= today()"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "repo_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "repo_uniq_count >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_stars >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "avg_stars >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "median_stars >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_forks >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_watchers >= 0"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "archived_repo_count >= 0"
+    columns:
+      - name: snapshot_date
+        description: "Snapshot date published to the site"
+        data_tests:
+          - not_null
+      - name: topic
+        description: "Normalized topic bucket"
+        data_tests:
+          - not_null
+      - name: repo_count
+        description: "Topic occurrence count"
+        data_tests:
+          - not_null
+      - name: repo_uniq_count
+        description: "Distinct repository count per topic"
+        data_tests:
+          - not_null
+      - name: total_stars
+        description: "Total stars in the topic bucket"
+        data_tests:
+          - not_null
+      - name: avg_stars
+        description: "Average stars in the topic bucket"
+        data_tests:
+          - not_null
+      - name: median_stars
+        description: "Median stars in the topic bucket"
+        data_tests:
+          - not_null
+      - name: total_forks
+        description: "Total forks in the topic bucket"
+        data_tests:
+          - not_null
+      - name: total_watchers
+        description: "Total watchers in the topic bucket"
+        data_tests:
+          - not_null
+      - name: archived_repo_count
+        description: "Archived repositories in the topic bucket"
+        data_tests:
+          - not_null

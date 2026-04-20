@@ -1,13 +1,13 @@
 import argparse
 import csv
 import json
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
-import requests
 from requests.exceptions import HTTPError, RequestException
+
+from ingestion.app.github_api import build_github_session
 
 
 def parse_args():
@@ -63,19 +63,7 @@ def get_repositories(csv_path, repo_arg):
 
 
 def build_session():
-    token = os.environ.get("GITHUB_TOKEN", "").strip()
-    session = requests.Session()
-    session.headers.update(
-        {
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": "open-source-de-ecosystem-radar",
-        }
-    )
-    if token:
-        session.headers["Authorization"] = f"Bearer {token}"
-
-    return session
+    return build_github_session()
 
 
 def snapshot_path(raw_root, run_date, owner, repo):

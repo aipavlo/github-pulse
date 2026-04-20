@@ -23,22 +23,6 @@ services:
       - clickhouse_logs:/var/log/clickhouse-server
       - ./data:/var/lib/clickhouse/user_files/import:ro
 
-  lightdash_db:
-    image: pgvector/pgvector:pg15
-    container_name: lightdash_db
-    hostname: lightdash_db
-    environment:
-      POSTGRES_USER: ${LIGHTDASH_DB_USER}
-      POSTGRES_PASSWORD: ${LIGHTDASH_DB_PASSWORD}
-      POSTGRES_DB: ${LIGHTDASH_DB_NAME}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${LIGHTDASH_DB_USER} -d ${LIGHTDASH_DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    volumes:
-      - lightdash_db_data:/var/lib/postgresql/data      
-
   dbt:
     build:
       context: .
@@ -59,32 +43,6 @@ services:
     working_dir: /usr/app/dbt
     volumes:
       - ./dbt:/usr/app/dbt
-
-  lightdash:
-    image: lightdash/lightdash:0.2248.3
-    container_name: lightdash
-    hostname: lightdash
-    depends_on:
-      lightdash_db:
-        condition: service_healthy
-      clickhouse:
-        condition: service_healthy
-    ports:
-      - "8080:8080"
-    env_file:
-      - .env
-    environment:
-      PGHOST: lightdash_db
-      PGPORT: 5432
-      PGUSER: ${LIGHTDASH_DB_USER}
-      PGPASSWORD: ${LIGHTDASH_DB_PASSWORD}
-      PGDATABASE: ${LIGHTDASH_DB_NAME}
-      SECURE_COOKIES: "false"
-      TRUST_PROXY: "false"
-      SITE_URL: http://localhost:8080
-      PORT: 8080
-    volumes:
-      - ./dbt:/usr/app/dbt:ro      
 
   prefect:
     build:
@@ -110,7 +68,19 @@ services:
       - ./:/usr/app
     command: ["tail", "-f", "/dev/null"]
 
+  evidence:
+    build:
+      context: .
+      dockerfile: infra/evidence/Dockerfile
+    container_name: evidence
+    hostname: evidence
+    working_dir: /usr/app/evidence
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./evidence:/usr/app/evidence
+    command: ["sh", "-lc", "npm run dev -- --host 0.0.0.0 --port 3000"]
+
 volumes:
   clickhouse_data:
   clickhouse_logs:
-  lightdash_db_data:

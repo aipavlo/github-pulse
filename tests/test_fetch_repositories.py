@@ -1,8 +1,12 @@
+import csv
 from pathlib import Path
 
 import requests
 
 from ingestion.app import fetch_repositories
+from ingestion.app.github_api import GITHUB_API_VERSION, GITHUB_USER_AGENT
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class DummyResponse:
@@ -30,6 +34,17 @@ class DummySession:
         self.calls.append((url, timeout))
         owner_repo = url.rsplit("/repos/", 1)[1]
         return self.responses[owner_repo]
+
+
+def test_fetch_session_uses_shared_github_headers(monkeypatch):
+    monkeypatch.setenv("GITHUB_TOKEN", "token-123")
+
+    session = fetch_repositories.build_session()
+
+    assert session.headers["Accept"] == "application/vnd.github+json"
+    assert session.headers["X-GitHub-Api-Version"] == GITHUB_API_VERSION
+    assert session.headers["User-Agent"] == GITHUB_USER_AGENT
+    assert session.headers["Authorization"] == "Bearer token-123"
 
 
 def test_parse_repo_url_rejects_concatenated_urls():
@@ -70,6 +85,27 @@ def test_get_repositories_skips_invalid_rows(tmp_path, capsys):
 
     output = capsys.readouterr().out
     assert "Malformed GitHub repository URL" in output
+
+
+def test_repository_catalog_contains_only_valid_github_urls():
+    csv_path = PROJECT_ROOT / "data" / "repositories_urls.csv"
+    invalid_rows = []
+    parsed_repositories = []
+
+    with csv_path.open("r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        for line_number, row in enumerate(reader, start=2):
+            url = row.get("url", "").strip()
+            if not url:
+                continue
+
+            try:
+                parsed_repositories.append(fetch_repositories.parse_repo_url(url))
+            except ValueError as exc:
+                invalid_rows.append(f"line {line_number}: {exc}")
+
+    assert parsed_repositories
+    assert invalid_rows == []
 
 
 def test_main_skips_not_found_and_continues(tmp_path, monkeypatch, capsys):

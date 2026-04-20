@@ -1,27 +1,18 @@
 import csv
-import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-import requests
+from requests.exceptions import HTTPError, RequestException
+
+from ingestion.app.github_api import build_github_session
 
 OUTPUT_FILE = Path("data/repositories_urls.csv")
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 SEARCH_URL = "https://api.github.com/search/repositories"
 
 MIN_STARS = 10000
 DAYS_BACK = 365
 PER_PAGE = 10
 MAX_PAGES = 1
-
-HEADERS = {
-    "Accept": "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2026-03-10",
-    "User-Agent": "de-repo-url-registry",
-}
-
-if GITHUB_TOKEN:
-    HEADERS["Authorization"] = f"Bearer {GITHUB_TOKEN}"
 
 
 def build_queries():
@@ -54,22 +45,37 @@ def read_existing_urls():
     return existing_urls
 
 
-def search_urls(query):
+def build_session():
+    return build_github_session()
+
+
+def search_urls(query, session=None):
+    session = session or build_session()
     found_urls = []
     for page in range(1, MAX_PAGES + 1):
-        response = requests.get(
-            SEARCH_URL,
-            headers=HEADERS,
-            params={
-                "q": query,
-                "sort": "updated",
-                "order": "desc",
-                "per_page": PER_PAGE,
-                "page": page,
-            },
-            timeout=60,
-        )
-        response.raise_for_status()
+        try:
+            response = session.get(
+                SEARCH_URL,
+                params={
+                    "q": query,
+                    "sort": "updated",
+                    "order": "desc",
+                    "per_page": PER_PAGE,
+                    "page": page,
+                },
+                timeout=60,
+            )
+            response.raise_for_status()
+        except HTTPError as exc:
+            status_code = exc.response.status_code if exc.response is not None else "unknown"
+            print(
+                f"[skip] search failed for query={query!r} page={page}: "
+                f"GitHub API returned {status_code}"
+            )
+            break
+        except RequestException as exc:
+            print(f"[skip] search failed for query={query!r} page={page}: request failed: {exc}")
+            break
 
         items = response.json().get("items", [])
         if not items:
@@ -102,13 +108,14 @@ def append_new_urls(urls):
     return added
 
 
-def collect_urls():
+def collect_urls(session=None):
+    session = session or build_session()
     collected_urls = []
     seen_urls = set()
 
     for query in build_queries():
         print(f"search: {query}")
-        for url in search_urls(query):
+        for url in search_urls(query, session=session):
             if url in seen_urls:
                 continue
 

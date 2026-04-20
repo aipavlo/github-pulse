@@ -37,3 +37,6 @@ models:
             marts:
                 +materialized: table
                 +tags: ['marts']
+            publish:
+                +materialized: table
+                +tags: ['publish']
