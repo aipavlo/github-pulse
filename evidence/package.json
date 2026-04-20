@@ -9,12 +9,13 @@
   },
   "scripts": {
     "postinstall": "node ./scripts/patch-evidence-template.mjs",
+    "prepare:duckdb": "node ./scripts/prepare-duckdb-cache.mjs",
     "dev": "node ./node_modules/@evidence-dev/evidence/cli.js dev",
-    "build": "EVIDENCE_BUILD_DIR=build node ./node_modules/@evidence-dev/evidence/cli.js build",
+    "build": "HOME=.evidence/home npm run prepare:duckdb && HOME=.evidence/home EVIDENCE_BUILD_DIR=build node ./node_modules/@evidence-dev/evidence/cli.js build",
     "preview": "node ./node_modules/@evidence-dev/evidence/cli.js preview",
-    "sources": "node ./node_modules/@evidence-dev/evidence/cli.js sources",
+    "sources": "HOME=.evidence/home npm run prepare:duckdb && HOME=.evidence/home node ./node_modules/@evidence-dev/evidence/cli.js sources",
     "build:pages": "npm run sources && npm run build",
-    "build:strict": "EVIDENCE_BUILD_DIR=build node ./node_modules/@evidence-dev/evidence/cli.js build:strict"
+    "build:strict": "HOME=.evidence/home npm run prepare:duckdb && HOME=.evidence/home EVIDENCE_BUILD_DIR=build node ./node_modules/@evidence-dev/evidence/cli.js build:strict"
   },
   "dependencies": {
     "@evidence-dev/component-utilities": "4.0.13",
@@ -42,7 +43,6 @@
   "overrides": {
     "cookie": "1.1.1",
     "minimatch": "10.2.5",
-    "nanoid": "5.1.9",
     "prismjs": "1.30.0",
     "trim": "1.0.1"
   }
