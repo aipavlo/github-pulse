@@ -11,7 +11,7 @@ The project is meant to answer a few practical questions in a simple, reproducib
 
 Target publication flow:
 
-`Prefect -> ingestion -> dbt run -> dbt test -> export static datasets -> commit datasets branch -> PR checks -> merge to main -> v*.*.* tag -> draft release -> Publish release -> Evidence build -> GitHub Pages`
+`Prefect -> ingestion -> dbt run -> dbt test -> export static datasets -> commit datasets branch -> PR checks -> merge to main -> v*.*.* tag -> Evidence build -> GitHub Pages`
 
 Core rules:
 - GitHub Actions and GitHub Pages never connect to ClickHouse.
@@ -96,9 +96,9 @@ The delivery model has three explicit steps:
 
 1. Data contour: Prefect and dbt prepare data, then export refreshes `evidence/sources/site_data/current/` locally.
 2. Git contour: the updated public datasets are committed to a separate branch, reviewed through PR checks, and merged to `main`.
-3. Delivery contour: a `v*.*.*` tag, such as `v0.0.1`, creates a draft release. Publishing that release triggers GitHub Actions, which reads committed datasets only, runs `npm run sources` and `npm run build:strict`, then deploys `evidence/build/` to GitHub Pages.
+3. Delivery contour: a `v*.*.*` tag, such as `v0.0.1`, triggers GitHub Actions, which reads committed datasets only, runs `npm run sources` and `npm run build:strict`, then deploys `evidence/build/` to GitHub Pages.
 
-Release gate: `v*.*.* tag -> draft release -> Publish release -> deploy Pages`.
+Release path: `v*.*.* tag -> deploy Pages`.
 
 This keeps data production, git publication, and Pages deployment separate and auditable.
 
