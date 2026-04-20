@@ -69,9 +69,9 @@ jobs:
         working-directory: evidence
         run: |
           cp sources/site_data/current/build_meta.json /tmp/build_meta.json.bak
+          trap 'mv /tmp/build_meta.json.bak sources/site_data/current/build_meta.json' EXIT
           printf '{broken json\n' > sources/site_data/current/build_meta.json
-          if npm run build:strict; then
+          if npm run sources -- --strict; then
             echo "Expected strict build to fail for broken dataset"
             exit 1
           fi
-          mv /tmp/build_meta.json.bak sources/site_data/current/build_meta.json

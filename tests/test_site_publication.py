@@ -27,6 +27,8 @@ def workflow_on(workflow: dict) -> dict:
 def test_evidence_local_build_entrypoints_smoke_help():
     if shutil.which("npm") is None:
         pytest.skip("npm is not available in this test environment")
+    if not (EVIDENCE_DIR / "node_modules" / "@evidence-dev" / "evidence" / "cli.js").exists():
+        pytest.skip("Evidence node dependencies are not installed")
 
     build_help = subprocess.run(
         ["npm", "run", "build:strict", "--", "--help"],
@@ -134,7 +136,7 @@ def test_build_check_workflow_validates_site_artifact_and_base_path():
         step for step in steps if step["name"] == "Verify broken dataset fails strict build"
     )
     assert "build_meta.json" in broken_dataset_check["run"]
-    assert "npm run build:strict" in broken_dataset_check["run"]
+    assert "npm run sources -- --strict" in broken_dataset_check["run"]
 
 
 def test_deploy_workflow_publishes_pages_artifact_from_evidence_build():
