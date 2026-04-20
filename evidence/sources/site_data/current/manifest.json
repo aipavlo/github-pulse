@@ -4,58 +4,58 @@
     {
       "content_type": "application/json",
       "path": "build_meta.json",
-      "sha256": "9e3e166fedd0fc53cb1b24a8ff382778bf49ed53c3e3b180ea336328bafd5493",
-      "size_bytes": 297
+      "sha256": "f928ae7ef63768dc75fe520b14e06592786cc3f8f418fd085f07b22571f1e9dc",
+      "size_bytes": 311
     },
     {
       "content_type": "text/csv",
       "path": "language_summary.csv",
       "row_count": 25,
-      "sha256": "a77864e991c61f493aca84070344c9ee278a87b56c1d44667fcabc02b18eada3",
-      "size_bytes": 1586
+      "sha256": "02c48da4c7259aa2f60a9fe5cf22ca5fe301f5e9dcb1515bc7db8b1460e1e0af",
+      "size_bytes": 1605
     },
     {
       "content_type": "application/json",
       "path": "manifest.json",
-      "sha256": "56b6ca56a2b646d948adfb0dc8bde97de07cf640ec4acb1396c88bf680570457",
+      "sha256": "53539d94f40e10b4edc0da0724f4e0840d71605b3094fcabb8d02e4a31844093",
       "size_bytes": 1611
     },
     {
       "content_type": "text/csv",
       "path": "owner_summary.csv",
-      "row_count": 331,
-      "sha256": "9eefed58a1219288805973b9d1943342fac5fbeda238d74f1c50d3c3e129b915",
-      "size_bytes": 15191
+      "row_count": 341,
+      "sha256": "ff370bea895ffecb7769afa704f7a959a51d7e1d2a90f8d09ea5f646d2f27e18",
+      "size_bytes": 15616
     },
     {
       "content_type": "text/csv",
       "path": "repo_top.csv",
-      "row_count": 350,
-      "sha256": "35e3e143125e9d723949c64fdc79982ece1ab12aec707af4451a9921ab39d45c",
-      "size_bytes": 96109
+      "row_count": 360,
+      "sha256": "af5a3ba59a7959758e93c241d84db11398027357ca762097f1fa0b98d5933847",
+      "size_bytes": 98439
     },
     {
       "content_type": "text/csv",
       "path": "repo_trend_monthly.csv",
-      "row_count": 382,
-      "sha256": "311d878b779fcfc87bad4ecab1cc0fa449716cf5c4a0e4f5a79c4695e97e303c",
-      "size_bytes": 37329
+      "row_count": 393,
+      "sha256": "88ea83ac672434860752e86fce5ffe38141e91da081e062377af657cc5ba1adf",
+      "size_bytes": 38434
     },
     {
       "content_type": "text/csv",
       "path": "site_kpis.csv",
       "row_count": 1,
-      "sha256": "731fce22935859013316f972ddcda13016be4f0121b8e8d45ca863cda7890079",
+      "sha256": "673a46431b228e0ccec227db4b60e39b33e6706738076c3db71e7519b4455bd6",
       "size_bytes": 209
     },
     {
       "content_type": "text/csv",
       "path": "topic_summary.csv",
       "row_count": 942,
-      "sha256": "221b3d6c224336dc4cafdd1452a3b9b06f14a029b5bb7944d1a010b40a76b704",
+      "sha256": "66235d8e73e748dbca1736e99edca35029bd232ca360334ddf6f1db67f3209e1",
       "size_bytes": 48556
     }
   ],
-  "generated_at": "2026-04-20T05:05:25.117222Z",
-  "snapshot_date": "2026-04-19"
+  "generated_at": "2026-04-20T22:11:27.765389Z",
+  "snapshot_date": "2026-04-20"
 }

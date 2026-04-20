@@ -77,6 +77,22 @@ def test_homepage_contains_freshness_metrics_and_shared_partials():
     assert '{@partial "source_support.md"}' in homepage
 
 
+def test_evidence_template_patch_keeps_tailwind_styles():
+    patch_script = read_text(EVIDENCE_DIR / "scripts" / "patch-evidence-template.mjs")
+    tailwind_config = read_text(EVIDENCE_DIR / "tailwind.config.cjs")
+
+    assert "@tailwind base;" in patch_script
+    assert "@tailwind components;" in patch_script
+    assert "@tailwind utilities;" in patch_script
+    assert "import '@evidence-dev/tailwind/fonts.css';" in patch_script
+    assert "tailwindcss(), sveltekit()" not in patch_script
+
+    assert "./.evidence/template/src/**/*.{html,js,svelte,ts,md}" in tailwind_config
+    assert "./node_modules/@evidence-dev/core-components/dist/**/*.{html,js,svelte,ts,md}" in (
+        tailwind_config
+    )
+
+
 def test_expected_site_pages_exist_and_use_shared_partials():
     expected_pages = {
         "index.md": "GitHub Pulse",

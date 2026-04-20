@@ -6,7 +6,11 @@ const templateRoots = [
   resolve(".evidence", "template"),
 ];
 
-const appCss = `:root {
+const appCss = `@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   color: #172033;
   background: #ffffff;
@@ -34,16 +38,13 @@ for (const templateRoot of templateRoots) {
   const fontsImport = "\timport '@evidence-dev/tailwind/fonts.css';\n";
   const currentLayout = readFileSync(layoutPath, "utf8");
 
-  if (currentLayout.includes(fontsImport)) {
-    writeFileSync(layoutPath, currentLayout.replace(fontsImport, ""), "utf8");
+  if (!currentLayout.includes(fontsImport)) {
+    writeFileSync(
+      layoutPath,
+      currentLayout.replace("import '../app.css';\n", `import '../app.css';\n${fontsImport}`),
+      "utf8",
+    );
   }
 
   writeFileSync(resolve(templateRoot, "src", "app.css"), appCss, "utf8");
-
-  const viteConfigPath = resolve(templateRoot, "vite.config.js");
-  const viteConfig = readFileSync(viteConfigPath, "utf8")
-    .replace(/\n\s*import tailwindcss from '@tailwindcss\/vite';\n/, "\n")
-    .replace("plugins: [tailwindcss(), sveltekit(),", "plugins: [sveltekit(),");
-
-  writeFileSync(viteConfigPath, viteConfig, "utf8");
 }

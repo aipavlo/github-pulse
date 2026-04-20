@@ -29,13 +29,13 @@ def run_command(command, cwd):
 
 @task(log_prints=True)
 def find_repositories():
-    run_command(["python", "ingestion/app/find_repositories.py"], cwd=PROJECT_ROOT)
+    run_command(["python", "-m", "ingestion.app.find_repositories"], cwd=PROJECT_ROOT)
 
 
 @task(log_prints=True)
 def fetch_repositories(run_date):
     run_command(
-        ["python", "ingestion/app/fetch_repositories.py", "--run-date", run_date],
+        ["python", "-m", "ingestion.app.fetch_repositories", "--run-date", run_date],
         cwd=PROJECT_ROOT,
     )
 
