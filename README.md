@@ -1,3 +1,14 @@
+## Project
+
+GitHub Pulse is an end-to-end analytics project for turning raw GitHub repository metadata into a reproducible public dashboard. It uses: 
+- Prefect for orchestration, 
+- ClickHouse as the warehouse, 
+- dbt for tested transformations, 
+- Evidence for the dashboard, 
+- and GitHub Actions/GitHub Pages for cloud publication.
+
+Live dashboard: https://aipavlo.github.io/github-pulse/
+
 # GitHub Pulse
 
 GitHub Pulse collects public GitHub repository metadata, builds analytics tables in ClickHouse, and publishes a static analytics site with Evidence and GitHub Pages.

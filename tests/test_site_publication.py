@@ -167,6 +167,7 @@ def test_deploy_workflow_publishes_pages_artifact_from_evidence_build():
     assert "release" not in workflow_trigger
     assert workflow["permissions"] == {"contents": "read"}
     assert deploy_job["permissions"] == {"pages": "write", "id-token": "write"}
+    assert "environment" not in deploy_job
     assert workflow["concurrency"]["group"] == "github-pages"
 
     upload_step = next(step for step in steps if step["name"] == "Upload Pages artifact")
