@@ -204,6 +204,12 @@ def test_security_workflows_and_policy_files_exist():
         step.get("uses", "").startswith("actions/dependency-review-action@")
         for step in dependency_review_steps
     )
+    dependency_review_step = next(
+        step
+        for step in dependency_review_steps
+        if step.get("uses", "").startswith("actions/dependency-review-action@")
+    )
+    assert dependency_review_step["continue-on-error"] is True
 
     assert codeql["permissions"] == {"contents": "read", "security-events": "write"}
     assert codeql["jobs"]["analyze"]["strategy"]["matrix"]["language"] == [
@@ -212,7 +218,6 @@ def test_security_workflows_and_policy_files_exist():
         "actions",
     ]
     assert "GitHub Security Advisories" in security_policy
-
 
 
 def test_all_github_actions_are_pinned_to_full_sha():
