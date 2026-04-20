@@ -1,0 +1,4 @@
+name: site_data
+type: duckdb
+options:
+  filename: ":memory:"

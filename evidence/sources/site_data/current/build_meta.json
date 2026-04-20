@@ -1,0 +1,10 @@
+{
+  "build_id": "20260420T050525Z",
+  "dataset_version": 1,
+  "datasets_dir": "/usr/app/evidence/sources/site_data/current",
+  "dbt_test_passed": true,
+  "exporter_version": "1",
+  "generated_at": "2026-04-20T05:05:25.117222Z",
+  "snapshot_date": "2026-04-19",
+  "source_run_date": "2026-04-01"
+}

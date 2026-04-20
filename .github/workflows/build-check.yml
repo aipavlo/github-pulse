@@ -1,0 +1,77 @@
+name: PR Site Build Check
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/build-check.yml"
+      - ".github/workflows/deploy-pages.yml"
+      - "evidence/**"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-check.yml"
+      - ".github/workflows/deploy-pages.yml"
+      - "evidence/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-site-build-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: evidence/.nvmrc
+          cache: npm
+          cache-dependency-path: evidence/package-lock.json
+
+      - name: Use npm 11
+        run: npm install --global npm@11.12.1
+
+      - name: Install Evidence dependencies
+        working-directory: evidence
+        run: npm ci
+
+      - name: Build source cache
+        working-directory: evidence
+        run: npm run sources -- --strict
+
+      - name: Build static site
+        working-directory: evidence
+        run: npm run build:strict
+
+      - name: Verify expected Pages artifact
+        run: |
+          test -f evidence/build/index.html
+          test -f evidence/build/repos/index.html
+          test -f evidence/build/languages/index.html
+          test -f evidence/build/owners/index.html
+          test -f evidence/build/topics/index.html
+          test -f evidence/build/trends/index.html
+
+      - name: Verify basePath is applied
+        run: |
+          grep -R '"/github-pulse/' evidence/build/index.html evidence/build/repos/index.html evidence/build/languages/index.html evidence/build/owners/index.html evidence/build/topics/index.html evidence/build/trends/index.html
+
+      - name: Verify broken dataset fails strict build
+        working-directory: evidence
+        run: |
+          cp sources/site_data/current/build_meta.json /tmp/build_meta.json.bak
+          printf '{broken json\n' > sources/site_data/current/build_meta.json
+          if npm run build:strict; then
+            echo "Expected strict build to fail for broken dataset"
+            exit 1
+          fi
+          mv /tmp/build_meta.json.bak sources/site_data/current/build_meta.json

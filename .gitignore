@@ -7,7 +7,6 @@ dbt/logs/
 dbt/.user.yml
 dbt/target
 dbt/dbt_packages
-dbt/package-lock.yml
 __pycache__/
 *.pyc
 .prefect/
@@ -20,3 +19,11 @@ htmlcov/
 *.egg-info/
 build/
 dist/
+evidence/node_modules/
+evidence/.evidence/
+evidence/build/
+evidence/.npm/
+evidence/.cache/
+evidence/sources/site_data/_tmp/
+node_modules/
+.npm/
