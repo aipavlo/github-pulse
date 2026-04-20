@@ -1,4 +1,5 @@
 import pathlib
+import re
 import shutil
 import subprocess
 
@@ -10,6 +11,7 @@ EVIDENCE_DIR = PROJECT_ROOT / "evidence"
 PAGES_DIR = EVIDENCE_DIR / "pages"
 PARTIALS_DIR = EVIDENCE_DIR / "partials"
 WORKFLOWS_DIR = PROJECT_ROOT / ".github" / "workflows"
+FULL_SHA_REF = re.compile(r"@[0-9a-f]{40}$")
 
 
 def read_text(path: pathlib.Path) -> str:
@@ -22,6 +24,19 @@ def load_yaml(path: pathlib.Path) -> dict:
 
 def workflow_on(workflow: dict) -> dict:
     return workflow.get("on", workflow.get(True, {}))
+
+
+def assert_full_sha_action_ref(action_ref: str) -> None:
+    assert FULL_SHA_REF.search(action_ref), action_ref
+
+
+def workflow_action_refs(workflow: dict) -> list[str]:
+    refs = []
+    for job in workflow["jobs"].values():
+        for step in job.get("steps", []):
+            if "uses" in step:
+                refs.append(step["uses"])
+    return refs
 
 
 def test_evidence_local_build_entrypoints_smoke_help():
@@ -108,6 +123,7 @@ def test_build_check_workflow_validates_site_artifact_and_base_path():
     assert workflow_trigger["push"]["branches"] == ["main"]
     assert "evidence/**" in workflow_trigger["push"]["paths"]
     assert build_job["timeout-minutes"] == 15
+    assert workflow["permissions"] == {"contents": "read"}
 
     step_names = [step["name"] for step in steps]
     assert step_names == [
@@ -148,12 +164,13 @@ def test_deploy_workflow_publishes_pages_artifact_from_evidence_build():
 
     assert "workflow_dispatch" in workflow_trigger
     assert workflow_trigger["push"]["tags"] == ["pages-*"]
-    assert workflow["permissions"]["pages"] == "write"
-    assert workflow["permissions"]["id-token"] == "write"
+    assert workflow["permissions"] == {"contents": "read"}
+    assert deploy_job["permissions"] == {"pages": "write", "id-token": "write"}
     assert workflow["concurrency"]["group"] == "github-pages"
 
     upload_step = next(step for step in steps if step["name"] == "Upload Pages artifact")
-    assert upload_step["uses"] == "actions/upload-pages-artifact@v3"
+    assert upload_step["uses"].startswith("actions/upload-pages-artifact@")
+    assert_full_sha_action_ref(upload_step["uses"])
     assert upload_step["with"]["path"] == "evidence/build"
 
     verify_step = next(step for step in steps if step["name"] == "Verify Pages artifact exists")
@@ -161,5 +178,50 @@ def test_deploy_workflow_publishes_pages_artifact_from_evidence_build():
     assert "test -d evidence/build" in verify_step["run"]
 
     deploy_step = deploy_job["steps"][0]
-    assert deploy_step["uses"] == "actions/deploy-pages@v4"
+    assert deploy_step["uses"].startswith("actions/deploy-pages@")
+    assert_full_sha_action_ref(deploy_step["uses"])
     assert deploy_job["needs"] == "build"
+
+
+def test_security_workflows_and_policy_files_exist():
+    codeowners = read_text(PROJECT_ROOT / ".github" / "CODEOWNERS")
+    dependabot = load_yaml(PROJECT_ROOT / ".github" / "dependabot.yml")
+    dependency_review = load_yaml(WORKFLOWS_DIR / "dependency-review.yml")
+    codeql = load_yaml(WORKFLOWS_DIR / "codeql.yml")
+    security_policy = read_text(PROJECT_ROOT / "SECURITY.md")
+
+    assert "/.github/workflows/ @aipavlo" in codeowners
+    assert dependabot["version"] == 2
+    assert dependabot["updates"][0]["package-ecosystem"] == "github-actions"
+    assert dependabot["updates"][0]["directory"] == "/"
+
+    assert dependency_review["permissions"] == {
+        "contents": "read",
+        "pull-requests": "read",
+    }
+    dependency_review_steps = dependency_review["jobs"]["dependency-review"]["steps"]
+    assert any(
+        step.get("uses", "").startswith("actions/dependency-review-action@")
+        for step in dependency_review_steps
+    )
+    dependency_review_step = next(
+        step
+        for step in dependency_review_steps
+        if step.get("uses", "").startswith("actions/dependency-review-action@")
+    )
+    assert dependency_review_step["continue-on-error"] is True
+
+    assert codeql["permissions"] == {"contents": "read", "security-events": "write"}
+    assert codeql["jobs"]["analyze"]["strategy"]["matrix"]["language"] == [
+        "python",
+        "javascript-typescript",
+        "actions",
+    ]
+    assert "GitHub Security Advisories" in security_policy
+
+
+def test_all_github_actions_are_pinned_to_full_sha():
+    for workflow_path in WORKFLOWS_DIR.glob("*.yml"):
+        workflow = load_yaml(workflow_path)
+        for action_ref in workflow_action_refs(workflow):
+            assert_full_sha_action_ref(action_ref)
