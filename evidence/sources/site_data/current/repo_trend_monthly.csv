@@ -319,8 +319,10 @@ snapshot_month,repo_full_name,owner_login,repo_name,primary_language,stargazers_
 2026-04-01,ClickHouse/dbt-clickhouse,ClickHouse,dbt-clickhouse,Python,338,163,338,108,5.6082
 2026-04-01,Costinha66/conflit_warehouse,Costinha66,conflit_warehouse,Python,0,0,0,0,0
 2026-04-01,DataTalksClub/data-engineering-zoomcamp,DataTalksClub,data-engineering-zoomcamp,Jupyter Notebook,40023,8012,40023,11,10.1147
+2026-04-01,Durant27/SQL-data-Warehouse-Project,Durant27,SQL-data-Warehouse-Project,TSQL,0,0,0,0,0
 2026-04-01,Innevatekiae/Galactic-Finance-GalFi-Crypto-Bot-Crypto-Game-Auto-Farm-Clicker-Cheat-Api,Innevatekiae,Galactic-Finance-GalFi-Crypto-Bot-Crypto-Game-Auto-Farm-Clicker-Cheat-Api,C#,1,0,1,0,0.4852
 2026-04-01,Issa-am/dallas-real-estate-pipeline,Issa-am,dallas-real-estate-pipeline,Python,0,0,0,0,0
+2026-04-01,JDParra-Rep/sql-data-warehouse-project,JDParra-Rep,sql-data-warehouse-project,TSQL,0,0,0,0,0
 2026-04-01,Kinghaksbfv/retail-sales-data-warehouse-sql-refactored,Kinghaksbfv,retail-sales-data-warehouse-sql-refactored,Jupyter Notebook,0,0,0,0,0
 2026-04-01,LessUp/awesome-cursorrules-zh,LessUp,awesome-cursorrules-zh,CSS,161,20,161,2,4.4747
 2026-04-01,MengYanUstc/buffet_munger_analysis,MengYanUstc,buffet_munger_analysis,Python,0,0,0,0,0
@@ -330,10 +332,13 @@ snapshot_month,repo_full_name,owner_login,repo_name,primary_language,stargazers_
 2026-04-01,PostHog/posthog-foss,PostHog,posthog-foss,Python,474,95,474,0,5.6836
 2026-04-01,PrefectHQ/prefect,PrefectHQ,prefect,Python,22187,2266,22187,901,9.323
 2026-04-01,RajashekharChaduvu588/sql-data-warehouse-project,RajashekharChaduvu588,sql-data-warehouse-project,Unknown,0,0,0,0,0
+2026-04-01,Sanjomwa/Civil-Liberties-and-Censorship-Analysis-with-Bruin,Sanjomwa,Civil-Liberties-and-Censorship-Analysis-with-Bruin,Python,0,0,0,0,0
 2026-04-01,StarRocks/starrocks,StarRocks,starrocks,Java,11582,2391,11582,988,8.8841
 2026-04-01,Tbach1203/glamira_user_behavior_pipeline,Tbach1203,glamira_user_behavior_pipeline,Python,0,0,0,0,0
 2026-04-01,ThePrivacyPrince/rockstar-tprm-assessment,ThePrivacyPrince,rockstar-tprm-assessment,Python,0,0,0,0,0
 2026-04-01,Xhinsoo/sql-data-warehouse,Xhinsoo,sql-data-warehouse,Unknown,0,0,0,0,0
+2026-04-01,Yiannis7918/Piraeus-Port-Maritime-Analytics,Yiannis7918,Piraeus-Port-Maritime-Analytics,Unknown,0,0,0,0,0
+2026-04-01,aaron-lee-hebert/farm-loan-risk-analytics,aaron-lee-hebert,farm-loan-risk-analytics,Python,0,0,0,0,0
 2026-04-01,airbytehq/airbyte,airbytehq,airbyte,Python,21094,5144,21094,2698,9.5335
 2026-04-01,anentropic/semolina,anentropic,semolina,Python,0,0,0,6,0
 2026-04-01,apache/flink,apache,flink,Java,25938,13915,25938,325,9.9767
@@ -346,6 +351,7 @@ snapshot_month,repo_full_name,owner_login,repo_name,primary_language,stargazers_
 2026-04-01,api-evangelist/amazon-data-pipeline,api-evangelist,amazon-data-pipeline,Unknown,0,0,0,0,0
 2026-04-01,argoproj/argo-workflows,argoproj,argo-workflows,Go,16618,3498,16618,1401,9.2509
 2026-04-01,bbergmann4/chi_inspections,bbergmann4,chi_inspections,Python,0,0,0,0,0
+2026-04-01,boseongkang/newstrend,boseongkang,newstrend,Python,0,0,0,0,0
 2026-04-01,catalyst-cooperative/pudl,catalyst-cooperative,pudl,Python,581,133,581,468,5.9259
 2026-04-01,chanakaekanayaka/Ecommerce-Sales-End-to-End-BI-Solution,chanakaekanayaka,Ecommerce-Sales-End-to-End-BI-Solution,TSQL,0,0,0,0,0
 2026-04-01,cloudquery/cloudquery,cloudquery,cloudquery,Go,6372,547,6372,127,8.0238
@@ -353,6 +359,7 @@ snapshot_month,repo_full_name,owner_login,repo_name,primary_language,stargazers_
 2026-04-01,dathere/qsv,dathere,qsv,Rust,3597,104,3597,46,7.1279
 2026-04-01,dbt-labs/dbt-core,dbt-labs,dbt-core,Python,12634,2377,12634,806,8.9432
 2026-04-01,debezium/debezium,debezium,debezium,Java,12620,2908,12620,131,9.0029
+2026-04-01,deepak-mry/stock-market-data-analyzer,deepak-mry,stock-market-data-analyzer,Python,0,0,0,0,0
 2026-04-01,dptel22/DataNarrator--MLH-AI-Hackfest,dptel22,DataNarrator--MLH-AI-Hackfest,HTML,0,0,0,1,0
 2026-04-01,faridd35/end-to-end-data-engineering-sql,faridd35,end-to-end-data-engineering-sql,TSQL,0,0,0,0,0
 2026-04-01,felixyustian/enterprise_ai_context_engine_fraud_risk_marketing,felixyustian,enterprise_ai_context_engine_fraud_risk_marketing,Jupyter Notebook,1,0,1,0,0.4852
@@ -362,18 +369,22 @@ snapshot_month,repo_full_name,owner_login,repo_name,primary_language,stargazers_
 2026-04-01,hritikanalytics/Agriculture-Snowflake-AWS-PowerBI,hritikanalytics,Agriculture-Snowflake-AWS-PowerBI,Unknown,0,0,0,0,0
 2026-04-01,huynhtai22/monstera-cloud,huynhtai22,monstera-cloud,TypeScript,0,0,0,0,0
 2026-04-01,iam-Kishor/data-warehouse-project,iam-Kishor,data-warehouse-project,TSQL,0,0,0,0,0
+2026-04-01,irppanpilihanrambe/data-pipeline-etl,irppanpilihanrambe,data-pipeline-etl,Python,1,0,1,0,0.4852
 2026-04-01,jobright-ai/2026-Data-Analysis-Internship,jobright-ai,2026-Data-Analysis-Internship,Unknown,153,7,153,1,4.1497
 2026-04-01,kestra-io/kestra,kestra-io,kestra,Java,26707,2553,26707,499,9.4885
 2026-04-01,kevin8818288-arch/Data-Management-and-Business-Strategy-Project--DVD-Rental-Company,kevin8818288-arch,Data-Management-and-Business-Strategy-Project--DVD-Rental-Company,Unknown,0,0,0,0,0
+2026-04-01,khalilzaghla/khalilzaghla,khalilzaghla,khalilzaghla,Unknown,0,0,0,0,0
 2026-04-01,konswe/konswe,konswe,konswe,Unknown,0,0,0,0,0
 2026-04-01,lauosgom/llamatel-crisis-lifeline-pipeline,lauosgom,llamatel-crisis-lifeline-pipeline,Python,0,0,0,0,0
 2026-04-01,lukasmasuch/best-of-python,lukasmasuch,best-of-python,Unknown,4421,325,4421,28,7.6121
 2026-04-01,pkurri/crucible,pkurri,crucible,HTML,0,0,0,16,0
 2026-04-01,prernak199-create/SQL-Data-Warehouse-Project,prernak199-create,SQL-Data-Warehouse-Project,TSQL,0,0,0,0,0
 2026-04-01,przygm/crypto-data-pipeline,przygm,crypto-data-pipeline,Python,0,0,0,0,0
+2026-04-01,pulumi/docs,pulumi,docs,HTML,154,261,154,254,5.2009
 2026-04-01,redpanda-data/connect,redpanda-data,connect,Go,8635,933,8635,283,8.3964
 2026-04-01,redpanda-data/redpanda,redpanda-data,redpanda,C++,11967,727,11967,674,8.5501
 2026-04-01,restuarifp/gis-data-pipeline,restuarifp,gis-data-pipeline,Unknown,0,0,0,0,0
+2026-04-01,revolver3090/weather-pipeline,revolver3090,weather-pipeline,Python,0,0,0,0,0
 2026-04-01,risingwavelabs/risingwave,risingwavelabs,risingwave,Rust,8933,755,8933,1449,8.3567
 2026-04-01,rizwanbinakbar/Sql-Data-warehouse-Project,rizwanbinakbar,Sql-Data-warehouse-Project,Unknown,1,0,1,0,0.4852
 2026-04-01,spiceai/spiceai,spiceai,spiceai,Rust,2877,186,2877,447,7.1447

@@ -439,9 +439,15 @@ def test_full_flow_smoke_with_mock_commands(monkeypatch, tmp_path):
     )
 
     assert commands == [
-        (("python", "ingestion/app/find_repositories.py"), str(prefect_flow.PROJECT_ROOT)),
+        (("python", "-m", "ingestion.app.find_repositories"), str(prefect_flow.PROJECT_ROOT)),
         (
-            ("python", "ingestion/app/fetch_repositories.py", "--run-date", "2026-04-01"),
+            (
+                "python",
+                "-m",
+                "ingestion.app.fetch_repositories",
+                "--run-date",
+                "2026-04-01",
+            ),
             str(prefect_flow.PROJECT_ROOT),
         ),
         (("dbt", "deps"), str(prefect_flow.DBT_DIR)),
