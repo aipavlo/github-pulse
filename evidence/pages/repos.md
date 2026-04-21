@@ -43,5 +43,3 @@ limit 15
 />
 
 <DataTable data={repos} />
-
-{@partial "source_support.md"}

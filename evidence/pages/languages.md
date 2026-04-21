@@ -30,5 +30,3 @@ limit 25
 />
 
 <DataTable data={language_summary} />
-
-{@partial "source_support.md"}

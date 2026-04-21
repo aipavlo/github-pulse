@@ -66,7 +66,7 @@ def test_evidence_local_build_entrypoints_smoke_help():
     assert "evidence sources" in sources_help.stdout
 
 
-def test_homepage_contains_freshness_metrics_and_shared_partials():
+def test_homepage_contains_freshness_metrics_and_navigation():
     homepage = read_text(PAGES_DIR / "index.md")
 
     assert "## Snapshot" in homepage
@@ -74,7 +74,7 @@ def test_homepage_contains_freshness_metrics_and_shared_partials():
     assert '<BigValue data={freshness} value="days_since_snapshot"' in homepage
     assert "<LineChart" in homepage
     assert '{@partial "site_nav.md"}' in homepage
-    assert '{@partial "source_support.md"}' in homepage
+    assert "source_support.md" not in homepage
 
 
 def test_evidence_template_patch_keeps_tailwind_styles():
@@ -93,7 +93,7 @@ def test_evidence_template_patch_keeps_tailwind_styles():
     )
 
 
-def test_expected_site_pages_exist_and_use_shared_partials():
+def test_expected_site_pages_exist_and_do_not_show_source_troubleshooting():
     expected_pages = {
         "index.md": "GitHub Pulse",
         "repos.md": "Repositories",
@@ -107,7 +107,8 @@ def test_expected_site_pages_exist_and_use_shared_partials():
         page = read_text(PAGES_DIR / filename)
         assert f"title: {page_title}" in page
         assert '{@partial "site_nav.md"}' in page
-        assert '{@partial "source_support.md"}' in page
+        assert "source_support.md" not in page
+        assert "Source troubleshooting" not in page
 
 
 def test_navigation_partial_links_expected_pages():
