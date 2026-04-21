@@ -31,5 +31,3 @@ limit 30
 />
 
 <DataTable data={topic_summary} />
-
-{@partial "source_support.md"}

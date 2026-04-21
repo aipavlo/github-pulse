@@ -62,5 +62,3 @@ limit 15
 />
 
 <DataTable data={top_repos} />
-
-{@partial "source_support.md"}

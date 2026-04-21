@@ -32,5 +32,3 @@ limit 30
 />
 
 <DataTable data={owner_summary} />
-
-{@partial "source_support.md"}

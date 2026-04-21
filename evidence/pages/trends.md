@@ -50,5 +50,3 @@ limit 100
 />
 
 <DataTable data={repo_trends} />
-
-{@partial "source_support.md"}
