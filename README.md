@@ -19,6 +19,8 @@ This project is designed and evaluated as a batch-orchestrated pipeline with Pre
 
 ClickHouse storage is optimized for the dashboard query patterns: monthly snapshot tables are partitioned by snapshot month, repository-level tables are ordered around repository and snapshot keys, and publish-facing summary tables are ordered around snapshot date plus the main reporting dimension, which keeps reads aligned with views such as `repo_top`, `topic_summary`, and `repo_trend_monthly`.
 
+Partitioning follows the monthly snapshot cadence because the upstream dbt layer frequently works with month-based slices for trend and export queries. Ordering keeps repository-level rows close to repository and snapshot keys, which supports latest-per-repository reads and monthly trend extraction, while publish-facing summary tables stay ordered by snapshot date and reporting dimension so the dashboard-facing exports read data in the same shape they are queried.
+
 The project is meant to help a learner, mentor, or maintainer quickly understand which GitHub repositories in the dataset are worth following, comparing, or revisiting, and to support simple decisions about visibility, activity, and topic/language focus.
 
 In practice, the dashboard answers a few concrete questions:
