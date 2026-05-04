@@ -1,5 +1,8 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    engine='MergeTree()',
+    order_by='(meta_full_name, meta_fetched_at)',
+    partition_by='meta_snapshot_month'
 ) }}
 
 with latest_repositories as (

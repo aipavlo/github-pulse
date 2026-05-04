@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 
 from requests.exceptions import HTTPError, RequestException
 
-from ingestion.app.github_api import build_github_session
+from ingestion.app.github_api import build_github_session, describe_github_rate_limit
 
 
 def parse_args():
@@ -106,7 +106,10 @@ def main():
             response.raise_for_status()
         except HTTPError as exc:
             status_code = exc.response.status_code if exc.response is not None else "unknown"
+            rate_limit_message = describe_github_rate_limit(exc.response)
             print(f"[skip] {owner}/{repo} -> GitHub API returned {status_code}")
+            if rate_limit_message:
+                print(f"[skip] {owner}/{repo} -> {rate_limit_message}")
             skipped += 1
             failed += 1
             continue

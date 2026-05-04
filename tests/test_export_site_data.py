@@ -168,6 +168,7 @@ def test_export_datasets_dry_run_writes_expected_files(tmp_path):
     assert build_meta["source_run_date"] == "2026-04-18"
     assert build_meta["dataset_version"] == export_site_data.DATASET_VERSION
     assert build_meta["exporter_version"] == "1"
+    assert build_meta["anomaly_checks_passed"] is True
 
     manifest = json.loads((export_dir / "manifest.json").read_text(encoding="utf-8"))
     assert {entry["path"] for entry in manifest["files"]} == {
@@ -256,6 +257,42 @@ def test_export_datasets_fail_on_empty(tmp_path):
             dry_run=True,
             only_dataset=None,
             fail_on_empty=True,
+        )
+
+
+def test_export_datasets_rejects_sharp_row_count_drop_against_previous_snapshot(tmp_path):
+    client = DummyClient(make_dataset_rows())
+    current_dir = tmp_path / "current"
+    current_dir.mkdir(parents=True)
+    (current_dir / "manifest.json").write_text(
+        json.dumps(
+            {
+                "dataset_version": 1,
+                "generated_at": "2026-04-17T15:00:00Z",
+                "snapshot_date": "2026-03-01",
+                "files": [
+                    {
+                        "path": "repo_top.csv",
+                        "sha256": "old",
+                        "size_bytes": 12345,
+                        "row_count": 5000,
+                        "content_type": "text/csv",
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(export_site_data.ExportContractError, match="sharp row-count drop"):
+        export_site_data.export_datasets(
+            client=client,
+            output_root=tmp_path,
+            build_id="build-drop",
+            run_date="2026-04-18",
+            dry_run=True,
+            only_dataset=None,
+            fail_on_empty=False,
         )
 
 

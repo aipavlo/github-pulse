@@ -181,6 +181,10 @@ SHARP_GROWTH_SIZE_RATIO = 2.0
 SHARP_GROWTH_ROW_RATIO = 2.0
 SHARP_GROWTH_MIN_SIZE_INCREASE_BYTES = 256 * 1024
 SHARP_GROWTH_MIN_ROW_INCREASE = 1_000
+SHARP_DROP_SIZE_RATIO = 0.5
+SHARP_DROP_ROW_RATIO = 0.5
+SHARP_DROP_MIN_SIZE_DECREASE_BYTES = 256 * 1024
+SHARP_DROP_MIN_ROW_DECREASE = 1_000
 
 
 class ExportContractError(RuntimeError):
@@ -432,19 +436,20 @@ def load_existing_manifest(current_dir: Path) -> dict[str, Any] | None:
     return json.loads(manifest_path.read_text(encoding="utf-8"))
 
 
-def validate_sharp_growth(
+def collect_manifest_anomalies(
     new_manifest_files: list[dict[str, Any]],
     current_dir: Path,
-) -> None:
+) -> list[str]:
     existing_manifest = load_existing_manifest(current_dir)
     if existing_manifest is None:
-        return
+        return []
 
     previous_files = {
         entry["path"]: entry
         for entry in existing_manifest.get("files", [])
         if entry.get("content_type") == "text/csv"
     }
+    anomalies: list[str] = []
 
     for new_entry in new_manifest_files:
         if new_entry.get("content_type") != "text/csv":
@@ -461,8 +466,17 @@ def validate_sharp_growth(
             and new_size > previous_size * SHARP_GROWTH_SIZE_RATIO
             and (new_size - previous_size) > SHARP_GROWTH_MIN_SIZE_INCREASE_BYTES
         ):
-            raise ExportContractError(
+            anomalies.append(
                 f"{new_entry['path']}: sharp size growth detected "
+                f"({previous_size} -> {new_size})"
+            )
+        if (
+            previous_size > 0
+            and new_size < previous_size * SHARP_DROP_SIZE_RATIO
+            and (previous_size - new_size) > SHARP_DROP_MIN_SIZE_DECREASE_BYTES
+        ):
+            anomalies.append(
+                f"{new_entry['path']}: sharp size drop detected "
                 f"({previous_size} -> {new_size})"
             )
 
@@ -475,10 +489,33 @@ def validate_sharp_growth(
             and new_row_count > previous_row_count * SHARP_GROWTH_ROW_RATIO
             and (new_row_count - previous_row_count) > SHARP_GROWTH_MIN_ROW_INCREASE
         ):
-            raise ExportContractError(
+            anomalies.append(
                 f"{new_entry['path']}: sharp row-count growth detected "
                 f"({previous_row_count} -> {new_row_count})"
             )
+        if (
+            previous_row_count is not None
+            and new_row_count is not None
+            and previous_row_count > 0
+            and new_row_count < previous_row_count * SHARP_DROP_ROW_RATIO
+            and (previous_row_count - new_row_count) > SHARP_DROP_MIN_ROW_DECREASE
+        ):
+            anomalies.append(
+                f"{new_entry['path']}: sharp row-count drop detected "
+                f"({previous_row_count} -> {new_row_count})"
+            )
+
+    return anomalies
+
+
+def validate_manifest_anomalies(
+    new_manifest_files: list[dict[str, Any]],
+    current_dir: Path,
+) -> list[str]:
+    anomalies = collect_manifest_anomalies(new_manifest_files, current_dir)
+    if anomalies:
+        raise ExportContractError("; ".join(anomalies))
+    return anomalies
 
 
 def detect_noop_export(
@@ -590,6 +627,7 @@ def export_datasets(
         "snapshot_date": snapshot_date,
         "source_run_date": run_date,
         "dbt_test_passed": True,
+        "anomaly_checks_passed": True,
         "datasets_dir": str(target_dir),
         "dataset_version": DATASET_VERSION,
         "exporter_version": "1",
@@ -620,7 +658,7 @@ def export_datasets(
     ensure_expected_files(tmp_export_dir, expected_files)
     validate_metadata_sizes(tmp_export_dir)
     validate_total_size(tmp_export_dir)
-    validate_sharp_growth(manifest["files"], current_dir)
+    validate_manifest_anomalies(manifest["files"], current_dir)
     no_op = detect_noop_export(manifest["files"], current_dir)
 
     if build_meta["dbt_test_passed"] is not True:

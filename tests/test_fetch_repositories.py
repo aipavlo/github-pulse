@@ -10,9 +10,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class DummyResponse:
-    def __init__(self, status_code=200, payload=None):
+    def __init__(self, status_code=200, payload=None, headers=None):
         self.status_code = status_code
         self._payload = payload or {}
+        self.headers = headers or {}
 
     def raise_for_status(self):
         if self.status_code >= 400:
@@ -159,3 +160,50 @@ def test_main_skips_not_found_and_continues(tmp_path, monkeypatch, capsys):
     saved_files = list(Path(raw_root).rglob("*.json"))
     assert len(saved_files) == 1
     assert "good__repo__" in saved_files[0].name
+
+
+def test_main_logs_rate_limit_details(tmp_path, monkeypatch, capsys):
+    csv_path = tmp_path / "repositories_urls.csv"
+    csv_path.write_text(
+        "\n".join(
+            [
+                "url",
+                "https://github.com/rate/limited",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    raw_root = tmp_path / "raw"
+    session = DummySession(
+        {
+            "rate/limited": DummyResponse(
+                status_code=403,
+                headers={"X-RateLimit-Remaining": "0", "X-RateLimit-Reset": "1777996800"},
+            ),
+        }
+    )
+
+    monkeypatch.setattr(fetch_repositories, "build_session", lambda: session)
+    monkeypatch.setattr(
+        fetch_repositories,
+        "parse_args",
+        lambda: type(
+            "Args",
+            (),
+            {
+                "csv": str(csv_path),
+                "raw_root": str(raw_root),
+                "repo": "",
+                "run_date": "2026-04-01",
+                "force": False,
+            },
+        )(),
+    )
+
+    fetch_repositories.main()
+
+    output = capsys.readouterr().out
+    assert "GitHub API returned 403" in output
+    assert "GitHub API rate limit reached" in output

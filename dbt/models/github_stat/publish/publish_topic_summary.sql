@@ -1,5 +1,8 @@
 {{ config(
-    tags=['publish']
+    tags=['publish'],
+    engine='MergeTree()',
+    order_by='(snapshot_date, topic)',
+    partition_by='toYYYYMM(snapshot_date)'
 ) }}
 
 select
@@ -13,5 +16,5 @@ select
     total_forks,
     total_watchers,
     archived_repo_count
-from {{ ref('dm_repo_topic_summar') }}
+from {{ ref('dm_repo_topic_summary') }}
 order by snapshot_date desc, total_stars desc, repo_count desc, topic asc

@@ -4,8 +4,8 @@
     {
       "content_type": "application/json",
       "path": "build_meta.json",
-      "sha256": "6cef8134087bfc6c20f94c6995c24885c48ecdf71b6f73c4a91c0002b102baaf",
-      "size_bytes": 311
+      "sha256": "5117c082c145e82213c3732b3084fa86b6d270e49401c2055ec2f4afd93568d6",
+      "size_bytes": 344
     },
     {
       "content_type": "text/csv",
@@ -17,7 +17,7 @@
     {
       "content_type": "application/json",
       "path": "manifest.json",
-      "sha256": "b518267643cded15abb0e5700aa8cef339abe265d53ae35eb1330a185c39c6d8",
+      "sha256": "cf9d3387cab0e043ca736cc32479c5e1804076b5fa7cbd3a35376fe43c8eafaa",
       "size_bytes": 1612
     },
     {
@@ -31,7 +31,7 @@
       "content_type": "text/csv",
       "path": "repo_top.csv",
       "row_count": 377,
-      "sha256": "f7655bb0b194653b48be10c69072b4b59291ea9571857111926240f6b7075b2d",
+      "sha256": "a0beac12de0cb63a45d120d91c9a681bf1588f221b964149ebfda1e79776a987",
       "size_bytes": 102762
     },
     {
@@ -56,6 +56,6 @@
       "size_bytes": 49155
     }
   ],
-  "generated_at": "2026-05-03T19:20:17.227248Z",
+  "generated_at": "2026-05-04T21:42:39.199687Z",
   "snapshot_date": "2026-05-03"
 }

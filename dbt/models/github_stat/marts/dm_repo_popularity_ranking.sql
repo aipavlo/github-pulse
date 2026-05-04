@@ -1,5 +1,8 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    engine='MergeTree()',
+    order_by='(meta_fetched_at, popularity_rank, meta_full_name)',
+    partition_by='toYYYYMM(meta_fetched_at)'
 ) }}
 
 with base as (

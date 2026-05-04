@@ -4,7 +4,7 @@ from pathlib import Path
 
 from requests.exceptions import HTTPError, RequestException
 
-from ingestion.app.github_api import build_github_session
+from ingestion.app.github_api import build_github_session, describe_github_rate_limit
 
 OUTPUT_FILE = Path("data/repositories_urls.csv")
 SEARCH_URL = "https://api.github.com/search/repositories"
@@ -68,10 +68,13 @@ def search_urls(query, session=None):
             response.raise_for_status()
         except HTTPError as exc:
             status_code = exc.response.status_code if exc.response is not None else "unknown"
+            rate_limit_message = describe_github_rate_limit(exc.response)
             print(
                 f"[skip] search failed for query={query!r} page={page}: "
                 f"GitHub API returned {status_code}"
             )
+            if rate_limit_message:
+                print(f"[skip] {rate_limit_message}")
             break
         except RequestException as exc:
             print(f"[skip] search failed for query={query!r} page={page}: request failed: {exc}")

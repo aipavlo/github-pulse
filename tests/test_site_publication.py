@@ -95,7 +95,9 @@ def test_evidence_template_patch_keeps_tailwind_styles():
 
 def test_expected_site_pages_exist_and_do_not_show_source_troubleshooting():
     expected_pages = {
+        "about.md": "About",
         "index.md": "GitHub Pulse",
+        "use-cases.md": "Use Cases",
         "repos.md": "Repositories",
         "languages.md": "Languages",
         "owners.md": "Owners",
@@ -115,11 +117,13 @@ def test_navigation_partial_links_expected_pages():
     nav = read_text(PARTIALS_DIR / "site_nav.md")
 
     assert "[Overview](./)" in nav
+    assert "[Use Cases](./use-cases)" in nav
     assert "[Repositories](./repos)" in nav
     assert "[Languages](./languages)" in nav
     assert "[Owners](./owners)" in nav
     assert "[Topics](./topics)" in nav
     assert "[Trends](./trends)" in nav
+    assert "[About](./about)" in nav
 
 
 def test_evidence_config_uses_project_site_base_path():
@@ -158,6 +162,7 @@ def test_build_check_workflow_validates_site_artifact_and_base_path():
     artifact_check = next(
         step for step in steps if step["name"] == "Verify expected Pages artifact"
     )
+    assert "evidence/build/about/index.html" in artifact_check["run"]
     assert "evidence/build/index.html" in artifact_check["run"]
     assert "evidence/build/repos/index.html" in artifact_check["run"]
     assert "evidence/build/trends/index.html" in artifact_check["run"]
@@ -245,7 +250,7 @@ def test_security_workflows_and_policy_files_exist():
         for step in dependency_review_steps
         if step.get("uses", "").startswith("actions/dependency-review-action@")
     )
-    assert dependency_review_step["continue-on-error"] is True
+    assert "continue-on-error" not in dependency_review_step
 
     assert codeql["permissions"] == {"contents": "read", "security-events": "write"}
     assert codeql["jobs"]["analyze"]["strategy"]["matrix"]["language"] == [

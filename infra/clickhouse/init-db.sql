@@ -6,7 +6,7 @@ CREATE OR REPLACE VIEW dezc_dwh.raw
 AS
 SELECT json
 FROM file(
-    'import/raw/repositories/extract_date=*/owner=*/repo=*/*.json',
+    'raw/repositories/extract_date=*/owner=*/repo=*/*.json',
     'RawBLOB',
     'json String'
 );

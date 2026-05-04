@@ -1,5 +1,8 @@
 {{ config(
-    materialized='table'
+    materialized='table',
+    engine='MergeTree()',
+    order_by='(snapshot_at, topic)',
+    partition_by='toYYYYMM(snapshot_at)'
 ) }}
 
 with exploded_topics as (

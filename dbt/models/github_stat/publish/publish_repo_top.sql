@@ -1,5 +1,8 @@
 {{ config(
-    tags=['publish']
+    tags=['publish'],
+    engine='MergeTree()',
+    order_by='(snapshot_date, popularity_rank, repo_full_name)',
+    partition_by='toYYYYMM(snapshot_date)'
 ) }}
 
 with ranked_repositories as (
