@@ -1,5 +1,8 @@
 {{ config(
-    tags=['publish']
+    tags=['publish'],
+    engine='MergeTree()',
+    order_by='(snapshot_month, repo_full_name)',
+    partition_by='snapshot_month'
 ) }}
 
 with monthly_snapshots as (

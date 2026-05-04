@@ -1,10 +1,11 @@
 {
-  "build_id": "20260503T192017Z",
+  "anomaly_checks_passed": true,
+  "build_id": "20260504T214239Z",
   "dataset_version": 1,
-  "datasets_dir": "/usr/app/evidence/sources/site_data/_tmp/20260503T192017Z",
+  "datasets_dir": "/usr/app/evidence/sources/site_data/_tmp/20260504T214239Z",
   "dbt_test_passed": true,
   "exporter_version": "1",
-  "generated_at": "2026-05-03T19:20:17.227248Z",
+  "generated_at": "2026-05-04T21:42:39.199687Z",
   "snapshot_date": "2026-05-03",
   "source_run_date": "2026-05-01"
 }

@@ -1,5 +1,8 @@
 {{ config(
-    tags=['publish']
+    tags=['publish'],
+    engine='MergeTree()',
+    order_by='snapshot_date',
+    partition_by='toYYYYMM(snapshot_date)'
 ) }}
 
 with latest_repositories as (

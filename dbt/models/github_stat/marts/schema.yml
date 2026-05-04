@@ -229,7 +229,7 @@ models:
         data_tests:
           - not_null
 
-  - name: dm_repo_topic_summar
+  - name: dm_repo_topic_summary
     description: "Aggregated repository metrics by topic"
     columns:
       - name: topic

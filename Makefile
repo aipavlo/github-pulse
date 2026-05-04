@@ -2,7 +2,7 @@ PROJECT_NAME := github-repository-radar
 RUN_DATE ?= $(shell date +%Y-%m-01)
 SITE_DATA_ROOT := evidence/sources/site_data
 
-.PHONY: help env build up down logs dbt-deps dbt-run dbt-test prefect-run export-site-data evidence-install evidence-deps evidence-dev evidence-build pages-build-local check-site clean-site-data-tmp lint test-python qa-python check
+.PHONY: help env build up down logs smoke-clickhouse run-local-e2e dbt-deps dbt-run dbt-test prefect-run export-site-data evidence-install evidence-deps evidence-dev evidence-build pages-build-local check-site clean-site-data-tmp lint test-python qa-python check
 
 help:
 	@echo "$(PROJECT_NAME) commands"
@@ -11,6 +11,8 @@ help:
 	@echo "make up           - start all main services"
 	@echo "make down         - stop all services"
 	@echo "make logs         - show docker compose logs"
+	@echo "make smoke-clickhouse - start ClickHouse and verify ping, query path, and init views"
+	@echo "make run-local-e2e - run the canonical local end-to-end pipeline"
 	@echo "make dbt-deps     - install dbt package dependencies"
 	@echo "make dbt-run      - run dbt models"
 	@echo "make dbt-test     - run dbt tests"
@@ -42,6 +44,28 @@ down:
 
 logs:
 	docker compose logs --tail=100
+
+smoke-clickhouse:
+	docker compose up -d clickhouse
+	for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do \
+		if docker compose exec -T clickhouse wget --no-verbose --tries=1 --spider http://localhost:8123/ping >/dev/null 2>&1; then \
+			break; \
+		fi; \
+		if [ "$$attempt" = "15" ]; then \
+			echo "ClickHouse did not become ready in time"; \
+			exit 1; \
+		fi; \
+		sleep 2; \
+	done
+	docker compose exec -T clickhouse clickhouse-client --query "SELECT 1"
+	test "$$(docker compose exec -T clickhouse clickhouse-client --query "SELECT count() FROM system.tables WHERE database = 'dezc_dwh' AND name IN ('raw', 'raw_normalized')")" = "2"
+
+run-local-e2e:
+	$(MAKE) build
+	$(MAKE) up
+	$(MAKE) prefect-run RUN_DATE=$(RUN_DATE)
+	$(MAKE) check-site
+	@echo "SUCCESS: local end-to-end pipeline completed"
 
 dbt-deps:
 	docker compose run --rm dbt dbt deps

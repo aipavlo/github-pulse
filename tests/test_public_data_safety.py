@@ -49,6 +49,7 @@ ALLOWED_BUILD_META_FIELDS = {
     "snapshot_date",
     "source_run_date",
     "dbt_test_passed",
+    "anomaly_checks_passed",
     "datasets_dir",
     "dataset_version",
     "git_commit",

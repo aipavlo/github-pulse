@@ -5,9 +5,10 @@ from ingestion.app.github_api import GITHUB_API_VERSION, GITHUB_USER_AGENT
 
 
 class DummySearchResponse:
-    def __init__(self, status_code=200, payload=None):
+    def __init__(self, status_code=200, payload=None, headers=None):
         self.status_code = status_code
         self._payload = payload or {"items": []}
+        self.headers = headers or {}
 
     def raise_for_status(self):
         if self.status_code >= 400:
@@ -85,6 +86,24 @@ def test_search_urls_logs_http_failure_and_returns_partial_results(capsys):
     output = capsys.readouterr().out
     assert urls == []
     assert "GitHub API returned 403" in output
+
+
+def test_search_urls_logs_rate_limit_details(capsys):
+    session = DummySearchSession(
+        [
+            DummySearchResponse(
+                status_code=429,
+                headers={"Retry-After": "60"},
+            )
+        ]
+    )
+
+    urls = find_repositories.search_urls("topic:data", session=session)
+
+    output = capsys.readouterr().out
+    assert urls == []
+    assert "GitHub API returned 429" in output
+    assert "GitHub API rate limit reached" in output
 
 
 def test_search_urls_logs_request_failure_and_returns_partial_results(capsys):

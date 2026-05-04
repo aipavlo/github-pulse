@@ -54,6 +54,7 @@ jobs:
 
       - name: Verify expected Pages artifact
         run: |
+          test -f evidence/build/about/index.html
           test -f evidence/build/index.html
           test -f evidence/build/repos/index.html
           test -f evidence/build/languages/index.html

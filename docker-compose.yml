@@ -18,10 +18,11 @@ services:
       timeout: 5s
       retries: 5
     volumes:
+      - ./infra/clickhouse/user-files-path.xml:/etc/clickhouse-server/config.d/user-files-path.xml:ro
       - ./infra/clickhouse/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
       - clickhouse_data:/var/lib/clickhouse
       - clickhouse_logs:/var/log/clickhouse-server
-      - ./data:/var/lib/clickhouse/user_files/import:ro
+      - ./data:/opt/clickhouse/user_files
 
   dbt:
     build:
